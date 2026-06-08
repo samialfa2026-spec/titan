@@ -1,23 +1,27 @@
 FROM ubuntu:22.04
 
-# تثبيت الحزم الأساسية وأدوات التمويه والشبكة داخل البيئة المعزولة
+# منع التوقفات التفاعلية أثناء التثبيت
+ENV DEBIAN_FRONTEND=noninteractive
+
+# تثبيت الأدوات الأساسية وإدارة اتصالات الشبكة والـ SSL لضمان التحميل الآمن
 RUN apt-get update && apt-get install -y \
     curl \
     wget \
     tar \
     iptables \
     netcat-openbsd \
+    ca-certificates \
     && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /app
 
-# تحميل الإصدار المحدث والمطلوب للشبكة (v0.1.22) بناءً على إرشادات المنصة
-RUN wget https://github.com/TitanNet-DAO/titan-node/releases/download/v0.1.22/titan-edge_v0.1.22_linux_amd64.tar.gz \
-    && tar -zxvf titan-edge_v0.1.22_linux_amd64.tar.gz \
-    && mv titan-edge_v0.1.22_linux_amd64/* . \
-    && rm -rf titan-edge_v0.1.22_linux_amd64*
+# تحميل الإصدار v0.1.22 بالروابط المحدثة والمطابقة لتسمية GitHub الجديدة
+RUN wget https://github.com/TitanNet-DAO/titan-node/releases/download/v0.1.22/titan-edge_v0.1.22_linux-amd64.tar.gz \
+    && tar -zxvf titan-edge_v0.1.22_linux-amd64.tar.gz \
+    && mv titan-edge_v0.1.22_linux-amd64/* . \
+    && rm -rf titan-edge_v0.1.22_linux-amd64*
 
-# المنفذ القياسي المطلوب للحفاظ على استقرار واستمرار استيقاظ الحاوية السحابية
+# المنفذ القياسي المطلوب للحفاظ على استقرار واستيقاظ الحاوية السحابية
 EXPOSE 7860
 
 # إنشاء سكربت الإقلاع التلقائي وحقن كود الربط الصحيح الخاص بك (ILp4RBFfu0UE)
@@ -32,5 +36,3 @@ wait\n\
 RUN chmod +x start.sh
 
 CMD ["./start.sh"]
-
-
